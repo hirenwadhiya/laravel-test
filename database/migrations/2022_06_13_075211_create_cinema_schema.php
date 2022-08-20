@@ -37,7 +37,68 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        try {
+            Schema::create('cinema', function (Blueprint $table){
+                $table->id();
+                $table->string('name');
+                $table->string('slug');
+                $table->timestamps();
+
+                $table->index('slug');
+            });
+
+            Schema::create('locations', function (Blueprint $table){
+                $table->id();
+                $table->string('name');
+                $table->string('slug');
+                $table->timestamps();
+
+                $table->index('slug');
+            });
+
+            Schema::create('movies', function (Blueprint $table){
+                $table->id();
+                $table->foreignId('cinema_id')->references('id')->on('cinema');
+                $table->foreignId('location_id')->references('id')->on('locations');
+                $table->string('movie_name');
+                $table->string('movie_slug');
+                $table->timestamps();
+
+                $table->index('movie_slug');
+            });
+
+            Schema::create('shows', function (Blueprint $table){
+                $table->id();
+                $table->foreignId('movie_id')->references('id')->on('movies');
+                $table->dateTime('start_time');
+                $table->dateTime('end_time');
+                $table->boolean('is_booked_out')->default(0);
+                $table->timestamps();
+            });
+
+            Schema::create('seat_types', function (Blueprint $table){
+                $table->id();
+                $table->foreignId('show_id')->references('id')->on('shows');
+                $table->string('seat_category_name');
+                $table->string('seat_category_slug');
+                $table->integer('price');
+                $table->timestamps();
+
+                $table->index('seat_category_slug');
+            });
+
+            Schema::create('bookings', function (Blueprint $table){
+                $table->id();
+                $table->foreignId('user_id')->references('id')->on('users');
+                $table->foreignId('seat_type_id')->references('id')->on('seat_types');
+                $table->foreignId('show_id')->references('id')->on('shows');
+                $table->integer('seat_number');
+                $table->timestamps();
+            });
+
+        }catch (Exception $exception){
+            throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        }
     }
 
     /**
